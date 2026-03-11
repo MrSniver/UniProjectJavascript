@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Administracyjny - Lista użytkowników</title>
+    <link rel="stylesheet" href="../style.css" />
+    <script src="../script.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="hamburger-menu">
+        <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()" />
+      </div>
+        
+        <div id="logged-in-section" style="display: none;">
+            <span>Aktualna waluta</span>
+            <span id="user-currency">0</span>
+            <a href="../sklep.html"><button>+</button></a>
+        </div>
+        
+        <div id="logged-in-user-panel" style="display: none;">
+            <a href="../UserPanel/panel.html"><button>Panel użytkownika</button></a>
+            <button onclick="logout()">Wyloguj się</button>
+            <img src="../Placeholdery/placeholder.jpg" alt="User Avatar" class="user-avatar" />
+        </div>
+        
+        <div id="not-logged-in-section" style="display: none; margin-left: auto;">
+            <a href="../Logowanie/login.html"><button>Zaloguj się</button></a>
+            <a href="../Rejestracja/register.html"><button>Zarejestruj się</button></a>
+        </div>
+    </header>
+
+    <div>
+      <nav>
+        <a href="../index.html"><button>Strona główna</button></a>
+        <a href="../Gry/blackjack.html"><button>Blackjack</button></a>
+        <a href="../Gry/ruletka.html"><button>Ruletka</button></a>
+        <a href="../Gry/sloty.html"><button>Sloty</button></a>
+        <a href="../sklep.html"><button>Sklep</button></a>
+        <a href="paneladminauzytkownicy.html"><button class="active-nav">Panel admina</button></a>
+      </nav>
+
+      <main>
+        <section class="filter-section">
+          <h2>Filtry</h2>
+          <div>
+            <div>
+              <label>Nazwa użytkownika</label>
+              <input
+                id="usernameFilter"
+                type="text"
+                placeholder="Nazwa użytkownika"
+              />
+            </div>
+
+            <div>
+              <label>Data od</label>
+              <input id="dateFromFilter" type="date" placeholder="Data od" />
+            </div>
+
+            <div>
+              <label>Data przed</label>
+              <input id="dateToFilter" type="date" placeholder="Data przed" />
+            </div>
+
+            <div>
+              <label>Zweryfikowany?</label>
+              <select id="verifiedFilter">
+                <option value="">Wybierz</option>
+                <option value="tak">Tak</option>
+                <option value="nie">Nie</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Zbanowany?</label>
+              <select id="bannedFilter">
+                <option value="">Wybierz</option>
+                <option value="tak">Tak</option>
+                <option value="nie">Nie</option>
+              </select>
+            </div>
+
+            <button onclick="applyFilters()">Szukaj</button>
+          </div>
+        </section>
+
+        <section class="nav-section">
+          <div>
+            <a href="paneladminauzytkownicy.html"
+              ><button>Lista użytkowników</button></a
+            >
+            <a href="paneladminauzytkownik.html"
+              ><button>Wyszukaj użytkownika</button></a
+            >
+          </div>
+        </section>
+
+        <section>
+          <table>
+            <thead>
+              <tr>
+                <th>Nr.</th>
+                <th>Login</th>
+                <th>Email</th>
+                <th>Nazwa użytkownika</th>
+                <th>Czy wiek zweryfikowany?</th>
+                <th>Konto stworzone</th>
+                <th>Ilość waluty</th>
+                <th>Czy zbanowany?</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+
+          <div class="pagination-section">
+            <div class="pagination-info">
+              <span id="pageInfo">Strona 1 z 1 (0 wyników)</span>
+            </div>
+            <div class="pagination-controls">
+              <button id="prevPage" onclick="changePage(-1)" disabled>
+                « Poprzednia
+              </button>
+              <span id="pageNumbers"></span>
+              <button id="nextPage" onclick="changePage(1)" disabled>
+                Następna »
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    
+    <script>
+        // Sprawdź status logowania przy załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            checkAdminStatus();
+            loadSelectedUser();
+            
+            // Load users table on page load
+            const token = localStorage.getItem('token');
+            if (token) {
+                fetchUsers(1, {});
+            }
+        });
+    </script>
+  </body>
+</html>

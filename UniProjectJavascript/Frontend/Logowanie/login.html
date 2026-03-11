@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logowanie - kasyno online</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../script.js"></script>
+</head>
+<body>
+    <header>
+        <div class="hamburger-menu">
+            <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()">
+        </div>
+        <div>
+            <button onclick="window.location.href='firststart.html'">Zaloguj się</button>
+        </div>
+    </header>
+
+    <div>
+        <main>
+            <section class="login-container">
+                <h1 class="login-title">Logowanie</h1>
+                
+                <form onsubmit="handleLogin(event); return false;">
+                    <div class="form-group">
+                        <label>Podaj nazwę użytkownika/email</label>
+                        <input type="text" id="username" placeholder="" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Podaj hasło</label>
+                        <input type="password" id="password" placeholder="" required>
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="#" onclick="alert('Funkcjonalność niedostępna'); return false;">Nie pamiętasz hasła?</a>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remember" checked>
+                        <label for="remember">Nie wylogowuj mnie</label>
+                    </div>
+
+                    <button type="submit" class="login-btn">→</button>
+                </form>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

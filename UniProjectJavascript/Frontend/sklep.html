@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sklep - Kasyno</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="hamburger-menu">
+        <img src="Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()" />
+      </div>
+      
+      <div id="logged-in-section" style="display: none;">
+        <span>Aktualna waluta</span>
+        <span id="user-currency">0</span>
+        <a href="sklep.html"><button>+</button></a>
+      </div>
+      
+      <div id="logged-in-user-panel" style="display: none;">
+        <a href="UserPanel/panel.html"><button>Panel użytkownika</button></a>
+        <button onclick="logout()">Wyloguj się</button>
+        <img src="Placeholdery/placeholder.jpg" alt="User Avatar" class="user-avatar" />
+      </div>
+      
+      <div id="not-logged-in-section" style="display: none; margin-left: auto;">
+        <a href="Logowanie/login.html"><button>Zaloguj się</button></a>
+        <a href="Rejestracja/register.html"><button>Zarejestruj się</button></a>
+      </div>
+    </header>
+
+    <div>
+        <nav>
+          <a href="index.html"><button>Strona główna</button></a>
+          <a href="Gry/blackjack.html"><button>Blackjack</button></a>
+          <a href="Gry/ruletka.html"><button>Ruletka</button></a>
+          <a href="Gry/sloty.html"><button>Sloty</button></a>
+          <a href="sklep.html"><button class="active-nav">Sklep</button></a>
+          <a href="PanelAdmin/paneladminauzytkownicy.html"><button>Panel admina</button></a>
+        </nav>
+
+      <main>
+        <section class="chip-section">
+          <div>
+            <div class="chip-card">
+              <img src="Placeholdery/chipplaceholder.jpg" alt="Żetony" class="chip-image" />
+              <div class="chip-info">
+                <div class="bonus-text">200 żetonów</div>
+                <div class="chip-description">Pakiet startowy</div>
+              </div>
+              <a href="UserPanel/payments.html?package=200&price=20&name=Pakiet startowy"><button class="chip-price">20 zł</button></a>
+            </div>
+
+            <div class="chip-card">
+              <img src="Placeholdery/chipplaceholder.jpg" alt="Żetony" class="chip-image" />
+              <div class="chip-info">
+                <div class="bonus-text">500 żetonów</div>
+                <div class="chip-description">Pakiet zwykły</div>
+              </div>
+              <a href="UserPanel/payments.html?package=500&price=50&name=Pakiet zwykły"><button class="chip-price">50 zł</button></a>
+            </div>
+
+            <div class="chip-card">
+              <img src="Placeholdery/chipplaceholder.jpg" alt="Żetony" class="chip-image" />
+              <div class="chip-info">
+                <div class="bonus-text">1000 żetonów + 100 dodatkowych</div>
+                <div class="chip-description">Pakiet premium z bonusem</div>
+              </div>
+              <a href="UserPanel/payments.html?package=1100&price=100&name=Pakiet premium z bonusem"><button class="chip-price">100 zł</button></a>
+            </div>
+
+            <div class="chip-card">
+              <img src="Placeholdery/chipplaceholder.jpg" alt="Żetony" class="chip-image" />
+              <div class="chip-info">
+                <div class="bonus-text">2000 żetonów + 200 dodatkowych</div>
+                <div class="chip-description">Pakiet deluxe z bonusem</div>
+              </div>
+              <a href="UserPanel/payments.html?package=2200&price=200&name=Pakiet deluxe z bonusem"><button class="chip-price">200 zł</button></a>
+            </div>
+          </div>
+
+          <div>
+            <div class="chip-card">
+              <img src="Placeholdery/chipplaceholder.jpg" alt="Żetony" class="chip-image" />
+              <div class="chip-info">
+                <div class="bonus-text">4000 żetonów + 400 dodatkowych</div>
+                <div class="chip-description">Pakiet ultimate z bonusem</div>
+              </div>
+              <a href="UserPanel/payments.html?package=4400&price=400&name=Pakiet ultimate z bonusem"><button class="chip-price">400 zł</button></a>
+            </div>
+
+            <div class="chip-card">
+              <img src="Placeholdery/chipplaceholder.jpg" alt="Żetony" class="chip-image" />
+              <div class="chip-info">
+                <div class="bonus-text">6000 żetonów + 600 dodatkowych</div>
+                <div class="chip-description">Pakiet mega z bonusem</div>
+              </div>
+              <a href="UserPanel/payments.html?package=6600&price=600&name=Pakiet mega z bonusem"><button class="chip-price">600 zł</button></a>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    
+    <script>
+        // Sprawdź status logowania przy załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            checkAdminStatus();
+        });
+    </script>
+  </body>
+</html>

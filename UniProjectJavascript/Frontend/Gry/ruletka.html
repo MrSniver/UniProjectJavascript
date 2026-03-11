@@ -1,0 +1,87 @@
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ruletka</title>
+    <link rel="stylesheet" href="../style.css" />
+    <script src="../script.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <div class="hamburger-menu">
+        <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()" />
+      </div>
+      
+      <div id="logged-in-section" style="display: none;">
+        <span>Aktualna waluta</span>
+        <span id="user-currency">0</span>
+        <a href="../sklep.html"><button>+</button></a>
+      </div>
+      
+      <div id="logged-in-user-panel" style="display: none;">
+        <a href="../UserPanel/panel.html"><button>Panel użytkownika</button></a>
+        <button onclick="logout()">Wyloguj się</button>
+        <img src="../Placeholdery/placeholder.jpg" alt="User Avatar" class="user-avatar" />
+      </div>
+      
+      <div id="not-logged-in-section" style="display: none; margin-left: auto;">
+        <a href="../Logowanie/login.html"><button>Zaloguj się</button></a>
+        <a href="../Rejestracja/register.html"><button>Zarejestruj się</button></a>
+      </div>
+    </header>
+
+    <div>
+      <nav>
+        <a href="../index.html"><button>Strona główna</button></a>
+        <a href="blackjack.html"><button>Blackjack</button></a>
+        <a href="ruletka.html"><button class="active-nav">Ruletka</button></a>
+        <a href="sloty.html"><button>Sloty</button></a>
+        <a href="../sklep.html"><button>Sklep</button></a>
+        <a href="../PanelAdmin/paneladminauzytkownicy.html"><button>Panel admina</button></a>
+      </nav>
+
+      <main class="game-area">
+        <h1>Ruletka</h1>
+
+        <div id="status-message">
+          Wybierz liczbę i stawkę, potem zakręć kołem!
+        </div>
+
+        <div class="roulette-layout">
+          <div class="roulette-wheel-container">
+            <canvas id="roulette-wheel" width="400" height="400"></canvas>
+            <button id="spin-btn" class="game-btn">Zakręć</button>
+          </div>
+
+          <div class="bets-panel">
+            <div class="zero-slot">
+              <button class="bet-btn green">0</button>
+            </div>
+
+            <div class="numbers-grid"></div>
+
+            <div class="bet-controls">
+              <label>Stawka:</label>
+              <input
+                class="dark-input"
+                type="number"
+                id="bet-amount"
+                value="10"
+                min="1"
+              />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+  
+  <script src="ruletka_client.js"></script>
+  <script>
+        // Sprawdź status logowania przy załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            checkAdminStatus();
+        });
+    </script>
+</html>

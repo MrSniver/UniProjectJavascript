@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Panel użytkownika</title>
+    <link rel="stylesheet" href="../style.css" />
+    <script src="../script.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="hamburger-menu">
+        <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()" />
+      </div>
+        
+        <div id="logged-in-section" style="display: none;">
+            <span>Aktualna waluta</span>
+            <span id="user-currency">0</span>
+            <a href="../sklep.html"><button>+</button></a>
+        </div>
+        
+        <div id="logged-in-user-panel" style="display: none;">
+            <a href="panel.html"><button class="active-nav">Panel użytkownika</button></a>
+            <button onclick="logout()">Wyloguj się</button>
+            <img src="../Placeholdery/placeholder.jpg" alt="User Avatar" class="user-avatar" />
+        </div>
+        
+        <div id="not-logged-in-section" style="display: none; margin-left: auto;">
+            <a href="../Logowanie/login.html"><button>Zaloguj się</button></a>
+            <a href="../Rejestracja/register.html"><button>Zarejestruj się</button></a>
+        </div>
+    </header>
+
+    <div>
+      <nav>
+        <a href="../index.html"><button>Strona główna</button></a>
+        <a href="../Gry/blackjack.html"><button>Blackjack</button></a>
+        <a href="../Gry/ruletka.html"><button>Ruletka</button></a>
+        <a href="../Gry/sloty.html"><button>Sloty</button></a>
+        <a href="../sklep.html"><button>Sklep</button></a>
+        <a href="../PanelAdmin/paneladminauzytkownicy.html"
+          ><button>Panel admina</button></a
+        >
+      </nav>
+
+      <main class="user-panel">
+        <h1>Panel użytkownika</h1>
+
+        <div>
+          <section>
+            <h2>Nazwa użytkownika</h2>
+            <p id="username-display">Adam</p>
+            <button
+              class="button-small"
+              onclick="window.location.href = 'edit-username.html'"
+            >
+              Zmień nazwę użytkownika
+            </button>
+          </section>
+
+          <section>
+            <h2>Hasło</h2>
+            <p>********</p>
+            <button
+              class="button-small"
+              onclick="window.location.href = 'edit-password.html'"
+            >
+              Zmień hasło
+            </button>
+          </section>
+
+          <section>
+            <h2>Metody płatności</h2>
+            <p>Zarządzaj swoimi kartami i metodami płatności.</p>
+            <button
+              class="button-small"
+              onclick="window.location.href = 'paymentmethods.html'"
+            >
+              Przejdź
+            </button>
+          </section>
+
+          <section>
+            <h2>Historia gier</h2>
+            <p>Zobacz wszystkie swoje wygrane i przegrane.</p>
+            <button
+              class="button-small"
+              onclick="window.location.href = 'history.html'"
+            >
+              Przejdź
+            </button>
+          </section>
+
+                    <section>
+            <h2>Historia płatności</h2>
+            <p>Sprawdź swoje zakupy.</p>
+            <button
+              class="button-small"
+              onclick="window.location.href = 'paneluzytkownikaPlatnosci.html'"
+            >
+              Przejdź
+            </button>
+          </section>
+        </div>
+      </main>
+    </div>
+    
+    <script>
+        // Sprawdź status logowania przy załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            checkAdminStatus();
+            
+            // Wyświetl nazwę zalogowanego użytkownika
+            const username = localStorage.getItem('username');
+            const usernameDisplay = document.getElementById('username-display');
+            if (username && usernameDisplay) {
+                usernameDisplay.textContent = username;
+            }
+        });
+    </script>
+  </body>
+</html>

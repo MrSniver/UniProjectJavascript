@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Metody płatności - Kasyno</title>
+    <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+    <header>
+        <div class="hamburger-menu">
+            <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()">
+        </div>
+        
+        <div id="logged-in-section" style="display: none;">
+            <span>Aktualna waluta</span>
+            <span id="user-currency">0</span>
+            <a href="../sklep.html"><button>+</button></a>
+        </div>
+        
+        <div id="logged-in-user-panel" style="display: none;">
+            <a href="panel.html"><button class="active-nav">Panel użytkownika</button></a>
+            <img src="../Placeholdery/placeholder.jpg" alt="User Avatar" class="user-avatar">
+        </div>
+        
+        <div id="not-logged-in-section" style="display: none; margin-left: auto;">
+            <a href="../Logowanie/login.html"><button>Zaloguj się</button></a>
+            <a href="../Rejestracja/register.html"><button>Zarejestruj się</button></a>
+        </div>
+    </header>
+
+    <div>
+      <nav>
+        <a href="../index.html"><button>Strona główna</button></a>
+        <a href="../Gry/blackjack.html"><button>Blackjack</button></a>
+        <a href="../Gry/ruletka.html"><button>Ruletka</button></a>
+        <a href="../Gry/sloty.html"><button>Sloty</button></a>
+        <a href="../sklep.html"><button>Sklep</button></a>
+        <a href="../PanelAdmin/paneladminauzytkownicy.html"><button>Panel admina</button></a>
+      </nav>
+
+      <main>
+        <div class="payment-methods-container">
+          <div class="payment-methods-header">
+            <h1>Metody płatności</h1>
+            <p>Zarządzaj swoimi kartami płatniczymi i metodami płatności</p>
+          </div>
+
+          <div class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">Zapisane karty</h2>
+              <button class="add-card-btn" onclick="toggleAddCardForm()">+ Dodaj kartę</button>
+            </div>
+
+            <div id="add-card-form" class="add-card-form">
+              <form id="new-card-form">
+                <div class="form-group">
+                  <label for="new-card-holder">Imię i nazwisko posiadacza</label>
+                  <input type="text" id="new-card-holder" placeholder="Jan Kowalski" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="new-card-number">Numer karty</label>
+                    <input type="text" id="new-card-number" placeholder="4000 0000 0000 0000" maxlength="19" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="new-card-date">Data ważności</label>
+                    <input type="text" id="new-card-date" placeholder="MM/YY" maxlength="5" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="new-card-cvv">Kod CVV</label>
+                  <input type="password" id="new-card-cvv" placeholder="123" maxlength="3" required>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="cancel-btn" onclick="toggleAddCardForm()">Anuluj</button>
+                  <button type="submit" class="save-btn">Zapisz kartę</button>
+                </div>
+              </form>
+            </div>
+
+            <div id="saved-cards-list" class="card-list">
+              <!-- Zapisane karty będą tutaj dynamicznie dodawane -->
+            </div>
+
+            <div id="no-cards-message" class="no-cards">
+              <div>💳</div>
+              <p>Nie masz jeszcze zapisanych kart płatniczych</p>
+              <p>Kliknij "Dodaj kartę" aby dodać swoją pierwszą kartę</p>
+            </div>
+          </div>
+
+
+        </div>
+      </main>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        // Sprawdź status logowania przy załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            checkAdminStatus();
+            loadSavedCards();
+        });
+        
+        // Zapisane karty
+        let savedCards = [];
+        let isEditingCard = false;
+        let editingCardId = null;
+
+        // Załaduj zapisane karty z API
+        async function loadSavedCards() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                displaySavedCards(); // Pokaż pustą listę jeśli nie zalogowany
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/payments/getpayments`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    savedCards = result.cards || [];
+                    displaySavedCards();
+                } else {
+                    console.error('Failed to load payment methods');
+                    savedCards = [];
+                    displaySavedCards();
+                }
+            } catch (error) {
+                console.error('Error loading payment methods:', error);
+                savedCards = [];
+                displaySavedCards();
+            }
+        }
+
+        // Wyświetl zapisane karty
+        function displaySavedCards() {
+            const cardsList = document.getElementById('saved-cards-list');
+            const noCardsMessage = document.getElementById('no-cards-message');
+
+            if (savedCards.length === 0) {
+                cardsList.style.display = 'none';
+                noCardsMessage.style.display = 'block';
+                return;
+            }
+
+            cardsList.style.display = 'block';
+            noCardsMessage.style.display = 'none';
+
+            cardsList.innerHTML = savedCards.map(card => `
+                <div class="saved-card">
+                    <div class="card-info">
+                        <div class="card-number">${card.type} ${card.number}</div>
+                        <div class="card-details">${card.holder} • ${card.expiry}</div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="edit-btn" onclick="editCard(${card.id})">Edytuj</button>
+                        <button class="delete-btn" onclick="deleteCard(${card.id})">Usuń</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Pokaż/ukryj formularz dodawania karty
+        function toggleAddCardForm() {
+            const form = document.getElementById('add-card-form');
+            form.classList.toggle('show');
+            
+            if (form.classList.contains('show')) {
+                document.getElementById('new-card-holder').focus();
+            } else {
+                // Reset formularza przy zamknięciu
+                document.getElementById('new-card-form').reset();
+                resetFormToAddMode();
+            }
+        }
+        
+        // Resetuj formularz do trybu dodawania
+        function resetFormToAddMode() {
+            isEditingCard = false;
+            editingCardId = null;
+            document.querySelector('.save-btn').textContent = 'Zapisz kartę';
+            document.querySelector('.section-title').textContent = 'Zapisane karty';
+            document.querySelector('.add-card-btn').style.display = 'inline-block';
+        }
+
+        // Dodaj nową kartę przez API
+        async function addNewCard(cardData) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Musisz być zalogowany!');
+                window.location.href = '../Logowanie/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/addpayment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        number: cardData.fullNumber,
+                        ccv: cardData.cvv,
+                        cardDate: cardData.expiry,
+                        cardHolder: cardData.holder
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Dodaj do lokalnej listy
+                    const newCard = {
+                        id: Date.now(),
+                        holder: cardData.holder,
+                        number: `****${cardData.fullNumber.slice(-4)}`,
+                        fullNumber: cardData.fullNumber,
+                        expiry: cardData.expiry,
+                        type: cardData.fullNumber.startsWith('4') ? 'Visa' : 'Mastercard'
+                    };
+                    
+                    savedCards.push(newCard);
+                    displaySavedCards();
+                    toggleAddCardForm();
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || 'Błąd podczas dodawania karty');
+                }
+            } catch (error) {
+                console.error('Error adding payment method:', error);
+                alert('Błąd połączenia z serwerem');
+            }
+        }
+
+        // Usuń kartę przez API
+        async function deleteCard(id) {
+            if (!confirm('Czy na pewno chcesz usunąć tę kartę?')) {
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Musisz być zalogowany!');
+                window.location.href = '../Logowanie/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/payments/deletepayment`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Usuń z lokalnej listy
+                    savedCards = savedCards.filter(card => card.id !== id);
+                    displaySavedCards();
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || 'Błąd podczas usuwania karty');
+                }
+            } catch (error) {
+                console.error('Error deleting payment method:', error);
+                alert('Błąd połączenia z serwerem');
+            }
+        }
+
+        // Edytuj kartę przez API
+        function editCard(id) {
+            const card = savedCards.find(c => c.id === id);
+            if (!card) {
+                alert('Nie znaleziono karty');
+                return;
+            }
+
+            // Włącz tryb edycji
+            isEditingCard = true;
+            editingCardId = id;
+            
+            // Wypełnij formularz danymi karty
+            document.getElementById('new-card-holder').value = card.holder;
+            document.getElementById('new-card-number').value = card.fullNumber ? 
+                card.fullNumber.match(/.{1,4}/g).join(' ') : '';
+            document.getElementById('new-card-date').value = card.expiry;
+            document.getElementById('new-card-cvv').value = '';
+            
+            // Zmień tekst przycisku i tytuł
+            document.querySelector('.save-btn').textContent = 'Aktualizuj kartę';
+            document.querySelector('.section-title').textContent = 'Edytuj kartę';
+            document.querySelector('.add-card-btn').style.display = 'none';
+            
+            // Pokaż formularz
+            const form = document.getElementById('add-card-form');
+            form.classList.add('show');
+            document.getElementById('new-card-holder').focus();
+        }
+
+        // Formatowanie numeru karty
+        document.getElementById('new-card-number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            if (value.length <= 16) {
+                e.target.value = formattedValue;
+            }
+        });
+
+        // Formatowanie daty
+        document.getElementById('new-card-date').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0,2) + '/' + value.substring(2,4);
+            }
+            e.target.value = value;
+        });
+
+        // Obsługa formularza dodawania/edytowania karty
+        document.getElementById('new-card-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const cardData = {
+                holder: document.getElementById('new-card-holder').value,
+                fullNumber: document.getElementById('new-card-number').value.replace(/\s/g, ''),
+                expiry: document.getElementById('new-card-date').value,
+                cvv: document.getElementById('new-card-cvv').value
+            };
+
+            // Podstawowa walidacja
+            if (cardData.fullNumber.length !== 16) {
+                alert('Numer karty musi mieć 16 cyfr');
+                return;
+            }
+
+            if (cardData.expiry.length !== 5) {
+                alert('Data ważności musi być w formacie MM/YY');
+                return;
+            }
+
+            if (cardData.cvv.length !== 3) {
+                alert('Kod CVV musi mieć 3 cyfry');
+                return;
+            }
+
+            if (isEditingCard) {
+                await updateExistingCard(cardData);
+            } else {
+                await addNewCard(cardData);
+            }
+        });
+        
+        // Aktualizuj istniejącą kartę
+        async function updateExistingCard(cardData) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Musisz być zalogowany!');
+                window.location.href = '../Logowanie/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/payments/editpayment`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        number: cardData.fullNumber,
+                        ccv: cardData.cvv,
+                        cardDate: cardData.expiry,
+                        cardHolder: cardData.holder
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Aktualizuj lokalną listę
+                    const card = savedCards.find(c => c.id === editingCardId);
+                    if (card) {
+                        card.holder = cardData.holder;
+                        card.number = `****${cardData.fullNumber.slice(-4)}`;
+                        card.fullNumber = cardData.fullNumber;
+                        card.expiry = cardData.expiry;
+                        card.type = cardData.fullNumber.startsWith('4') ? 'Visa' : 'Mastercard';
+                    }
+                    
+                    displaySavedCards();
+                    toggleAddCardForm();
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || 'Błąd podczas edytowania karty');
+                }
+            } catch (error) {
+                console.error('Error editing payment method:', error);
+                alert('Błąd połączenia z serwerem');
+            }
+        }
+    </script>
+</body>
+</html>

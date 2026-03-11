@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weryfikacja po rejestracji - kasyno online</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../script.js"></script>
+</head>
+<body>
+    <header>
+        <div class="hamburger-menu">
+            <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()">
+        </div>
+        <div>
+            <button onclick="window.location.href='firststart.html'">Zaloguj się</button>
+        </div>
+    </header>
+
+    <div>
+        <main>
+            <section class="register3-container">
+                <div class="welcome-box">
+                    <p class="welcome-text">Witaj</p>
+                    <h1 class="welcome-title"></h1>
+                </div>
+
+                <label class="verification-label">Podaj kod potwierdzający z maila</label>
+
+                <form onsubmit="window.location.href='register4.html'; return false;">
+                    <div class="code-input-group">
+                        <input type="text" class="code-input" maxlength="1" placeholder="-" required>
+                        <input type="text" class="code-input" maxlength="1" placeholder="-" required>
+                        <input type="text" class="code-input" maxlength="1" placeholder="-" required>
+                        <input type="text" class="code-input" maxlength="1" placeholder="-" required>
+                        <input type="text" class="code-input" maxlength="1" placeholder="-" required>
+                        <input type="text" class="code-input" maxlength="1" placeholder="-" required>
+                    </div>
+
+                    <button type="submit" class="login-btn">→</button>
+                </form>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

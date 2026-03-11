@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack - Kasyno online</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../script.js"></script>
+</head>
+<body>
+        <!-- NAWIGACJA -->
+        <header>
+                <div class="hamburger-menu">
+                    <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()">
+                </div>
+                
+                <div id="logged-in-section" style="display: none;">
+                    <span>Aktualna waluta</span>
+                    <span id="user-currency">0</span>
+                    <a href="../sklep.html"><button>+</button></a>
+                </div>
+                
+                <div id="logged-in-user-panel" style="display: none;">
+                    <a href="../UserPanel/panel.html"><button>Panel użytkownika</button></a>
+                    <button onclick="logout()">Wyloguj się</button>
+                    <img src="../Placeholdery/placeholder.jpg" alt="User Avatar" class="user-avatar">
+                </div>
+                
+                <div id="not-logged-in-section" style="display: none; margin-left: auto;">
+                    <a href="../Logowanie/login.html"><button>Zaloguj się</button></a>
+                    <a href="../Rejestracja/register.html"><button>Zarejestruj się</button></a>
+                </div>
+        </header>
+
+        <div> 
+            <nav>
+                <a href="../index.html"><button>Strona główna</button></a>
+                <a href="blackjack.html"><button class="active-nav">Blackjack</button></a>
+                <a href="ruletka.html"><button>Ruletka</button></a>
+                <a href="sloty.html"><button>Sloty</button></a>
+                <a href="../sklep.html"><button>Sklep</button></a>
+                <a href="../PanelAdmin/paneladminauzytkownicy.html"><button>Panel admina</button></a>
+            </nav>
+        <main>
+            <section class="homepage-container">
+                <!-- Nagłówek główny -->
+                <h1 class="hero-title">Blackjack</h1>
+
+                <!-- Obszar gry -->
+                <div class="game-area">
+                    <div id="status-message">Wybierz stawkę i zacznij grę!</div>
+
+                    <div class="table">
+                        <div class="hand-section">
+                            <h2>Krupier</h2>
+                            <div id="dealer-cards" class="cards-display"></div>
+                            <div id="dealer-score" class="score"></div>
+                        </div>
+
+                        <div class="hand-section">
+                            <h2>Twoje karty</h2>
+                            <div id="player-cards" class="cards-display"></div>
+                            <div id="player-score" class="score"></div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <div class="bet-input">
+                            <label>Stawka: </label>
+                            <input type="number" id="bet-amount" value="10" min="1">
+                        </div>
+                        <button id="btn-start" class="game-btn">Graj</button>
+                        <button id="btn-hit" class="game-btn" disabled>Dobierz (Hit)</button>
+                        <button id="btn-stand" class="game-btn" disabled>Pasuj (Stand)</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+        </div>
+
+    <script>
+        // Sprawdź status logowania przy załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            checkAdminStatus();
+        });
+    </script>
+</body>
+</html>

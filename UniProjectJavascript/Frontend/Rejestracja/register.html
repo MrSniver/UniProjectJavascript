@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rejestracja - kasyno online</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../script.js"></script>
+</head>
+<body>
+    <header>
+        <div class="hamburger-menu">
+            <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()">
+        </div>
+        <div>
+            <button onclick="window.location.href='firststart.html'">Zaloguj się</button>
+        </div>
+    </header>
+
+    <div>
+        <main>
+            <section class="register-container">
+                <form class="register-form" onsubmit="handleRegister(event);">
+                    <h2>Rejestracja</h2>
+                    
+                    <div class="form-group">
+                        <label>Podaj nazwę użytkownika</label>
+                        <input type="text" placeholder="TimCheese" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Podaj swój email</label>
+                        <input type="email" placeholder="timcheese@gmail.com" required>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="twoFactor" checked>
+                        <label for="twoFactor">Użyj maila jako autoryzacji dwuskładnikowej</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Podaj hasło</label>
+                        <input type="password" id="password" placeholder="" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Potwierdź hasło</label>
+                        <input type="password" id="confirmPassword" placeholder="" required>
+                    </div>
+
+                    <button type="submit" class="register-btn">Zarejestruj się</button>
+                </form>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

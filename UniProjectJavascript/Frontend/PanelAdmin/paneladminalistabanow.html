@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Administracyjny - Lista banów użytkownika</title>
+    <link rel="stylesheet" href="../style.css" />
+    <script src="../script.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="hamburger-menu">
+        <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()" />
+      </div>
+        
+        <div id="logged-in-section" style="display: none;">
+            <span>Aktualna waluta</span>
+            <span id="user-currency">0</span>
+            <a href="../sklep.html"><button>+</button></a>
+        </div>
+        
+        <div id="logged-in-user-panel" style="display: none;">
+            <a href="../UserPanel/panel.html"><button>Panel użytkownika</button></a>
+            <button onclick="logout()">Wyloguj się</button>
+            <img src="../Placeholdery/placeholder.jpg" alt="User Avatar" class="user-avatar" />
+        </div>
+        
+        <div id="not-logged-in-section" style="display: none; margin-left: auto;">
+            <a href="../Logowanie/login.html"><button>Zaloguj się</button></a>
+            <a href="../Rejestracja/register.html"><button>Zarejestruj się</button></a>
+        </div>
+    </header>
+
+    <div>
+      <nav>
+        <a href="../index.html"><button>Strona główna</button></a>
+        <a href="../Gry/blackjack.html"><button>Blackjack</button></a>
+        <a href="../Gry/ruletka.html"><button>Ruletka</button></a>
+        <a href="../Gry/sloty.html"><button>Sloty</button></a>
+        <a href="../sklep.html"><button>Sklep</button></a>
+        <a href="paneladminauzytkownicy.html"><button class="active-nav">Panel admina</button></a>
+      </nav>
+
+      <main>
+        <section class="ban-buttons">
+          <div>
+            <span>Wybrany użytkownik: <b id="searchedUser"></b></span>
+            <div>
+              <button onclick="openBanPopup()">Zbanuj</button>
+              <button onclick="unBan()">Odbanuj</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="nav-section">
+          <div>
+            <a href="paneladminalistabanow.html"
+              ><button>Lista banów użytkownika</button></a
+            >
+            <a href="paneladminaaktywnebany.html"
+              ><button>Aktywne bany</button></a
+            >
+            <a href="paneladminahistoriagier.html"
+              ><button>Historia gier użytkownika</button></a
+            >
+            <a href="paneladminahistoriaplatnosci.html"
+              ><button>Historia płatności użytkownika</button></a
+            >
+            <a href="paneladminazmiennazwe.html"
+              ><button>Zmień nazwę użytkownika</button></a
+            >
+            <a href="paneladminanadajadmina.html"
+              ><button>Zmień rolę użytkownika</button></a
+            >
+          </div>
+        </section>
+        <section>
+          <table>
+            <thead>
+              <tr>
+                <th>Nr.</th>
+                <th>Powód</th>
+                <th>Opis</th>
+                <th>Ban od</th>
+                <th>Ban do</th>
+                <th>Zbanowany przez</th>
+              </tr>
+            </thead>
+            <tbody id="ban-list-tbody">
+              <!-- Ban data will be loaded here from API -->
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <!-- Ban Popup -->
+    <div class="popup" id="banPopup">
+      <div class="popup-content">
+        <div class="popup-header">
+          <h3>Zbanuj użytkownika: <b id="searchedUser"></b></h3>
+          <button class="popup-close" onclick="closeBanPopup()">&times;</button>
+        </div>
+        <div class="popup-body">
+          <label for="banReason">Powód banu:</label>
+          <select id="banReason" required>
+            <option value="">Wybierz powód</option>
+            <option value="program wspomagający">Program Wspomagający</option>
+            <option value="łamanie regulaminu">Łamanie regulaminu</option>
+            <option value="oszukana waluta">Dodanie sfałszowanej waluty</option>
+            <option value="inne">Inne</option>
+          </select>
+
+          <label for="banDescription">Opis:</label>
+          <textarea
+            id="banDescription"
+            placeholder="Szczegółowy opis naruszenia..."
+            required
+          ></textarea>
+
+          <label for="banDuration">Czas trwania banu:</label>
+          <select id="banDuration" required>
+            <option value="">Wybierz czas</option>
+            <option value="1">1 dzień</option>
+            <option value="3">3 dni</option>
+            <option value="7">1 tydzień</option>
+            <option value="14">2 tygodnie</option>
+            <option value="30">1 miesiąc</option>
+            <option value="90">3 miesiące</option>
+            <option value="365">1 rok</option>
+            <option value="permanent">Permanent</option>
+          </select>
+        </div>
+        <div class="popup-footer">
+          <button class="cancel" onclick="closeBanPopup()">Anuluj</button>
+          <button onclick="submitBan()">Zbanuj użytkownika</button>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+        // Sprawdź status logowania przy załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            checkAdminStatus();
+            loadSelectedUser();
+            loadBanList();
+        });
+    </script>
+  </body>
+</html>

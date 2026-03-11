@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./logs:/usr/src/app/logs
+      - ./uploads:/usr/src/app/uploads
+    networks:
+      - casino-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    # Use this configuration when connecting to AWS RDS
+    # Comment out depends_on: postgres if using AWS RDS
+    
+  # Local PostgreSQL for development - remove if using AWS RDS
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=wirtualnekasyno
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database-init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - casino-network
+    restart: unless-stopped
+    # Uncomment below for better performance in production
+    # command: ["postgres", "-c", "max_connections=200", "-c", "shared_buffers=256MB"]
+
+  # Optional: Database administration tool
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    networks:
+      - casino-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+
+networks:
+  casino-network:
+    driver: bridge

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Zmień nazwę użytkownika</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+
+  <body>
+    <header>
+      <div class="hamburger-menu">
+        <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()" />
+      </div>
+        
+        <div id="logged-in-section" style="display: none;">
+            <span>Aktualna waluta</span>
+            <span id="user-currency">0</span>
+            <a href="../sklep.html"><button>+</button></a>
+        </div>
+        
+        <div id="logged-in-user-panel" style="display: none;">
+            <a href="panel.html"><button class="active-nav">Panel użytkownika</button></a>
+            <button onclick="logout()">Wyloguj się</button>
+            <img src="../Placeholdery/placeholder.jpg" alt="User Avatar" class="user-avatar" />
+        </div>
+        
+        <div id="not-logged-in-section" style="display: none; margin-left: auto;">
+            <a href="../Logowanie/login.html"><button>Zaloguj się</button></a>
+            <a href="../Rejestracja/register.html"><button>Zarejestruj się</button></a>
+        </div>
+    </header>
+
+    <div>
+      <nav>
+        <a href="../index.html"><button>Strona główna</button></a>
+        <a href="../Gry/blackjack.html"><button>Blackjack</button></a>
+        <a href="../Gry/ruletka.html"><button>Ruletka</button></a>
+        <a href="../Gry/sloty.html"><button>Sloty</button></a>
+        <a href="../sklep.html"><button>Sklep</button></a>
+        <a href="../PanelAdmin/paneladminauzytkownicy.html"
+          ><button>Panel admina</button></a
+        >
+      </nav>
+
+      <main>
+        <h1>Zmień nazwę użytkownika</h1>
+
+        <div>
+          <input
+            class="dark-input"
+            type="text"
+            id="new-username"
+            placeholder="Nowa nazwa użytkownika"
+          />
+          <button class="button-small" onclick="changeUsername()">Zapisz</button>
+          <p id="username-status"></p>
+        </div>
+      </main>
+    </div>
+
+    <script src="../script.js"></script>
+    <script src="edit_username.js"></script>
+    <script>
+        // Sprawdź status logowania przy załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            checkAdminStatus();
+            
+            // Wyświetl aktualną nazwę użytkownika
+            const currentUsername = localStorage.getItem('username');
+            const newUsernameInput = document.getElementById('new-username');
+            if (currentUsername && newUsernameInput) {
+                newUsernameInput.placeholder = `Aktualna nazwa: ${currentUsername}`;
+            }
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sloty - kasyno online</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header>
+        <div class="hamburger-menu">
+            <img src="../Placeholdery/hamburgermenu.png" alt="Menu" onclick="toggleMobileMenu()">
+        </div>
+        
+        <div id="logged-in-section" style="display: none;">
+            <span>Aktualna waluta</span>
+            <span id="user-currency">0</span>
+            <a href="../sklep.html"><button>+</button></a>
+        </div>
+        
+        <div id="logged-in-user-panel" style="display: none;">
+            <a href="../UserPanel/panel.html"><button>Panel użytkownika</button></a>
+            <button onclick="logout()">Wyloguj się</button>
+            <img src="../Placeholdery/placeholder.jpg" alt="User Avatar" class="user-avatar">
+        </div>
+        
+        <div id="not-logged-in-section" style="display: none; margin-left: auto;">
+            <a href="../Logowanie/login.html"><button>Zaloguj się</button></a>
+            <a href="../Rejestracja/register.html"><button>Zarejestruj się</button></a>
+        </div>
+    </header>
+
+    <div>
+        <nav>
+            <a href="../index.html"><button>Strona główna</button></a>
+            <a href="blackjack.html"><button>Blackjack</button></a>
+            <a href="ruletka.html"><button>Ruletka</button></a>
+            <a href="sloty.html"><button class="active-nav">Sloty</button></a>
+            <a href="../sklep.html"><button>Sklep</button></a>
+            <a href="../PanelAdmin/paneladminauzytkownicy.html" style="display: none;" id="admin-panel-link"><button>Panel admina</button></a>
+        </nav>
+
+        <main>
+            <section class="slots-container">
+                <h1 class="slots-title">Sloty</h1>
+                
+                <div class="bet-section">
+                    <label for="betAmount">Stawka:</label>
+                    <input type="number" id="betAmount" value="10" min="1" max="1000">
+                </div>
+                
+                <div class="reels">
+                    <div class="reel" id="reel1">🍒</div>
+                    <div class="reel" id="reel2">🍋</div>
+                    <div class="reel" id="reel3">💎</div>
+                </div>
+
+                <button class="spin-btn" onclick="spinSlots()">Spin to win</button>
+                
+                <div class="result" id="result"></div>
+                <div class="winnings" id="winnings"></div>
+                <div id="status-message" style="margin-top: 10px; font-size: 16px; min-height: 20px;"></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://13.53.174.126:3000/api';
+
+        // Slot machine symbols and payouts
+        const symbols = ['🍒', '🍋', '💎', '🔔', '⭐', '7️⃣'];
+        const payouts = {
+            '🍒🍒🍒': 3,
+            '🍋🍋🍋': 5,
+            '💎💎💎': 10,
+            '🔔🔔🔔': 15,
+            '⭐⭐⭐': 20,
+            '7️⃣7️⃣7️⃣': 50
+        };
+
+        let isSpinning = false;
+
+        // Authentication and currency functions
+        function isUserLoggedIn() {
+            const token = localStorage.getItem('token');
+            return !!token;
+        }
+
+        function makeAuthenticatedRequest(url, options = {}) {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                alert('Musisz być zalogowany!');
+                window.location.href = '../Logowanie/login.html';
+                return Promise.reject('No token');
+            }
+            
+            const defaultOptions = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+            
+            const mergedOptions = {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers
+                }
+            };
+            
+            return fetch(url, mergedOptions)
+                .then(response => {
+                    if (response.status === 401) {
+                        alert('Sesja wygasła. Zaloguj się ponownie.');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('refreshToken');
+                        localStorage.removeItem('username');
+                        window.location.href = '../Logowanie/login.html';
+                        return Promise.reject('Token expired');
+                    }
+                    return response;
+                });
+        }
+
+        async function updateUserCurrency(amount) {
+            try {
+                const response = await makeAuthenticatedRequest(`${API_BASE_URL}/users/updatecurrency`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ amount: amount })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to update currency');
+                }
+                
+                const data = await response.json();
+                console.log('Currency updated:', data);
+                
+                // Refresh displayed currency
+                await refreshDisplayedCurrency();
+                
+                return data;
+            } catch (error) {
+                console.error('Error updating currency:', error);
+                throw error;
+            }
+        }
+
+        async function refreshDisplayedCurrency() {
+            try {
+                const response = await makeAuthenticatedRequest(`${API_BASE_URL}/users/getcurrency`);
+                const data = await response.json();
+                
+                const currencyElement = document.getElementById('user-currency');
+                if (currencyElement) {
+                    currencyElement.textContent = data.currency || 0;
+                }
+                
+                return data.currency;
+            } catch (error) {
+                console.error('Error refreshing currency:', error);
+            }
+        }
+
+        function checkLoginStatus() {
+            const loggedInSection = document.getElementById('logged-in-section');
+            const loggedInUserPanel = document.getElementById('logged-in-user-panel');
+            const notLoggedInSection = document.getElementById('not-logged-in-section');
+            
+            if (isUserLoggedIn()) {
+                if (loggedInSection) loggedInSection.style.display = 'flex';
+                if (loggedInUserPanel) loggedInUserPanel.style.display = 'flex';
+                if (notLoggedInSection) notLoggedInSection.style.display = 'none';
+                
+                // Pobierz aktualną walutę
+                makeAuthenticatedRequest(`${API_BASE_URL}/users/getcurrency`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const currencyElement = document.getElementById('user-currency');
+                        if (currencyElement) {
+                            currencyElement.textContent = data.currency || 0;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching currency:', error);
+                        const currencyElement = document.getElementById('user-currency');
+                        if (currencyElement) {
+                            currencyElement.textContent = '0';
+                        }
+                    });
+            } else {
+                if (loggedInSection) loggedInSection.style.display = 'none';
+                if (loggedInUserPanel) loggedInUserPanel.style.display = 'none';
+                if (notLoggedInSection) notLoggedInSection.style.display = 'flex';
+            }
+        }
+
+        function checkAdminStatus() {
+            if (isUserLoggedIn()) {
+                makeAuthenticatedRequest(`${API_BASE_URL}/adminpanel/checkadmin`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const adminLink = document.getElementById('admin-panel-link');
+                        if (adminLink) {
+                            adminLink.style.display = data.isAdmin ? 'inline' : 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking admin status:', error);
+                        const adminLink = document.getElementById('admin-panel-link');
+                        if (adminLink) {
+                            adminLink.style.display = 'none';
+                        }
+                    });
+            } else {
+                const adminLink = document.getElementById('admin-panel-link');
+                if (adminLink) {
+                    adminLink.style.display = 'none';
+                }
+            }
+        }
+
+        function logout() {
+            makeAuthenticatedRequest(`${API_BASE_URL}/auth/logout`, { method: 'POST' })
+                .then(() => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('username');
+                    window.location.href = '../index.html';
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('username');
+                    alert('Wylogowano lokalnie');
+                    window.location.href = '../index.html';
+                });
+        }
+
+        async function placeBet(amount) {
+            try {
+                return await updateUserCurrency(-Math.abs(amount));
+            } catch (error) {
+                alert('Niewystarczająca ilość waluty!');
+                throw error;
+            }
+        }
+
+        async function addWinnings(amount) {
+            try {
+                return await updateUserCurrency(Math.abs(amount));
+            } catch (error) {
+                console.error('Error adding winnings:', error);
+                throw error;
+            }
+        }
+
+        // Slot machine logic
+        async function spinSlots() {
+            if (isSpinning) return;
+
+            const betAmount = parseInt(document.getElementById('betAmount').value);
+            
+            if (isNaN(betAmount) || betAmount <= 0) {
+                alert("Podaj prawidłową stawkę!");
+                return;
+            }
+
+            if (!isUserLoggedIn()) {
+                alert("Musisz być zalogowany aby grać!");
+                return;
+            }
+
+            try {
+                // Place bet (deduct currency)
+                await placeBet(betAmount);
+
+                isSpinning = true;
+                
+                // Clear previous results
+                document.getElementById('result').textContent = '';
+                document.getElementById('winnings').textContent = '';
+
+                // Spin animation
+                const reel1 = document.getElementById('reel1');
+                const reel2 = document.getElementById('reel2');
+                const reel3 = document.getElementById('reel3');
+
+                // Generate random symbols
+                const symbol1 = symbols[Math.floor(Math.random() * symbols.length)];
+                const symbol2 = symbols[Math.floor(Math.random() * symbols.length)];
+                const symbol3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+                // Animate spinning (simple animation)
+                let spins = 0;
+                const maxSpins = 20;
+                const spinInterval = setInterval(() => {
+                    reel1.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                    reel2.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                    reel3.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                    
+                    spins++;
+                    if (spins >= maxSpins) {
+                        clearInterval(spinInterval);
+                        finishSpin(symbol1, symbol2, symbol3, betAmount);
+                    }
+                }, 100);
+
+            } catch (error) {
+                console.error('Error during slot machine spin:', error);
+                alert('Wystąpił błąd podczas gry. Spróbuj ponownie.');
+                isSpinning = false;
+            }
+        }
+
+        async function finishSpin(symbol1, symbol2, symbol3, betAmount) {
+            // Set final symbols
+            document.getElementById('reel1').textContent = symbol1;
+            document.getElementById('reel2').textContent = symbol2;
+            document.getElementById('reel3').textContent = symbol3;
+
+            // Check for win
+            let multiplier = 0;
+            
+            // Check if all 3 symbols are the same
+            if (symbol1 === symbol2 && symbol2 === symbol3) {
+                multiplier = 10; // 3 identical symbols = x10
+            }
+            // Check if any 2 symbols are the same
+            else if (symbol1 === symbol2 || symbol2 === symbol3 || symbol1 === symbol3) {
+                multiplier = 2; // 2 identical symbols = x2
+            }
+            
+            const resultElement = document.getElementById('result');
+            const winningsElement = document.getElementById('winnings');
+
+            if (multiplier > 0) {
+                const winAmount = betAmount * multiplier;
+                resultElement.textContent = 'Wygrałeś!';
+                resultElement.style.color = 'green';
+                winningsElement.textContent = `Wygrana: ${winAmount} monet (x${multiplier})`;
+                winningsElement.style.color = 'green';
+                
+                // Add winnings to player account
+                await addWinnings(winAmount);
+            } else {
+                resultElement.textContent = 'Przegrana!';
+                resultElement.style.color = 'red';
+                winningsElement.textContent = `Stracono: ${betAmount} monet`;
+                winningsElement.style.color = 'red';
+            }
+
+            // Save game history
+            const gameStatus = multiplier > 0 ? 'win' : 'lose';
+            const wonAmount = multiplier > 0 ? betAmount * multiplier : 0;
+            await saveGameHistory('slots', gameStatus, wonAmount);
+
+            isSpinning = false;
+        }
+
+        // Save game history function
+        async function saveGameHistory(gameType, gameStatus, wonAmount) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.log('User not logged in, skipping game history save');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/games/history`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        gameType: gameType,
+                        gameStatus: gameStatus,
+                        wonAmount: wonAmount
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('Game history saved successfully');
+                } else {
+                    console.error('Failed to save game history:', response.status);
+                }
+            } catch (error) {
+                console.error('Error saving game history:', error);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            checkAdminStatus();
+        });
+    </script>
