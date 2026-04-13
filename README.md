@@ -1,3 +1,1 @@
-Small Virtual Casino project that was created for the university javascript course
-
-Backend of the project was done by myself, the frontend was created by the rest of my group
+This project was developed as part of a university Node.js course by a team of four. I was responsible for building the backend and configuring AWS infrastructure. The primary goal was to gain experience in developing a Node.js API secured with JWT authentication, as well as setting up databases and virtual machines in AWS.
